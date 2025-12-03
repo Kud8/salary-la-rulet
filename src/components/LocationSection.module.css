@@ -1,0 +1,193 @@
+.card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 1.75rem;
+  border: 1px solid rgba(73, 87, 117, 0.12);
+  box-shadow: 0 20px 35px rgba(42, 58, 112, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.label {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: #7c8297;
+  margin-bottom: 0.2rem;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.header span {
+  color: #5b6073;
+}
+
+.sheetLink {
+  align-self: flex-start;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(93, 80, 255, 0.3);
+  color: #5d50ff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.sheetLink:hover {
+  background: rgba(93, 80, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.metaRow span {
+  background: #f5f6fb;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  color: #4b5162;
+  border: 1px solid rgba(133, 142, 173, 0.15);
+}
+
+.baristaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.baristaItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 18px;
+  background: #f9f9ff;
+  border: 1px solid rgba(93, 80, 255, 0.12);
+}
+
+.baristaName {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.baristaRole {
+  color: #777d91;
+  font-size: 0.85rem;
+}
+
+.rateBlock {
+  text-align: right;
+}
+
+.rateBlock strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.bonus {
+  color: #5d50ff;
+  font-size: 0.85rem;
+}
+
+.sheetForm {
+  background: #f7f8ff;
+  border-radius: 22px;
+  padding: 1.25rem;
+  border: 1px solid rgba(93, 80, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.formField label {
+  font-size: 0.9rem;
+  color: #4b5162;
+}
+
+.formField input {
+  border-radius: 12px;
+  border: 1px solid rgba(73, 87, 117, 0.2);
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formField input:focus {
+  outline: none;
+  border-color: #5d50ff;
+  box-shadow: 0 0 0 3px rgba(93, 80, 255, 0.15);
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.submitButton {
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  background: #5d50ff;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(93, 80, 255, 0.3);
+}
+
+.resetButton {
+  border: none;
+  background: transparent;
+  color: #5d50ff;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.75rem 1rem;
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .baristaItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rateBlock {
+    text-align: left;
+  }
+}
+
