@@ -1,103 +1,56 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import styles from './LocationSection.module.css'
 import type { Location } from '../data/locations'
-import { SENIOR_BONUS } from '../data/locations'
 
 type LocationSectionProps = {
   location: Location
 }
 
+const DEFAULT_RANGE = 'B:K'
+
 export function LocationSection({ location }: LocationSectionProps) {
-  const [sheetTab, setSheetTab] = useState(location.sheet.tab)
-  const [columnRange, setColumnRange] = useState(location.sheet.range)
-
-  const stats = useMemo(() => {
-    if (!location.baristas.length) {
-      return { averageRate: 0, minRate: 0, maxRate: 0, seniorCount: 0 }
-    }
-
-    const rates = location.baristas.map((barista) => barista.rate)
-    const totalRate = rates.reduce((acc, rate) => acc + rate, 0)
-    const seniorCount = location.baristas.filter((barista) => barista.role === 'senior').length
-
-    return {
-      averageRate: Math.round(totalRate / location.baristas.length),
-      minRate: Math.min(...rates),
-      maxRate: Math.max(...rates),
-      seniorCount,
-    }
-  }, [location.baristas])
+  const [sheetGid, setSheetGid] = useState(location.gid)
+  const [columnRange, setColumnRange] = useState(DEFAULT_RANGE)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     console.group(`[${location.title}] Расчет`)
-    console.log('Google Sheet:', location.sheet.docUrl)
-    console.log('Tab:', sheetTab)
+    console.log('Google Sheet:', `${location.sheetUrl}#gid=${sheetGid}`)
+    console.log('gid:', sheetGid)
     console.log('Диапазон колонок:', columnRange)
-    console.log('Бариста (из JSON):', location.baristas)
-    console.log('Средняя ставка по точке:', `${stats.averageRate} ₽`)
-    console.log('Старшие бариста:', stats.seniorCount)
-    console.log('Бонус старшего (₽):', SENIOR_BONUS)
     console.groupEnd()
   }
 
   const handleReset = () => {
-    setSheetTab(location.sheet.tab)
-    setColumnRange(location.sheet.range)
+    setSheetGid(location.gid)
+    setColumnRange(DEFAULT_RANGE)
   }
 
+  const sheetLink = `${location.sheetUrl}#gid=${sheetGid}`
+
   return (
-    <section className={styles.card} style={{ borderColor: location.accentColor }}>
+    <section className={styles.card}>
       <div className={styles.header}>
         <div>
           <p className={styles.label}>Точка</p>
           <h2>{location.title}</h2>
-          <span>{location.address}</span>
         </div>
 
-        <a href={location.sheet.docUrl} className={styles.sheetLink} target="_blank" rel="noreferrer">
+        <a href={sheetLink} className={styles.sheetLink} target="_blank" rel="noreferrer">
           Открыть таблицу
         </a>
       </div>
 
-      <div className={styles.metaRow}>
-        <span>{location.baristas.length} бариста</span>
-        <span>{stats.seniorCount} старших</span>
-        <span>
-          {stats.minRate.toLocaleString('ru-RU')}–{stats.maxRate.toLocaleString('ru-RU')} ₽
-        </span>
-      </div>
-
-      <ul className={styles.baristaList}>
-        {location.baristas.map((barista) => (
-          <li key={barista.id} className={styles.baristaItem}>
-            <div>
-              <p className={styles.baristaName}>{barista.name}</p>
-              <span className={styles.baristaRole}>
-                {barista.role === 'senior' ? 'Старший бариста' : 'Бариста'}
-              </span>
-            </div>
-
-            <div className={styles.rateBlock}>
-              <strong>{barista.rate.toLocaleString('ru-RU')} ₽/ч</strong>
-              {barista.role === 'senior' && (
-                <span className={styles.bonus}>+ {SENIOR_BONUS.toLocaleString('ru-RU')} ₽ бонус</span>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-
       <form className={styles.sheetForm} onSubmit={handleSubmit}>
         <div className={styles.formField}>
-          <label htmlFor={`${location.id}-tab`}>Tab (название листа)</label>
+          <label htmlFor={`${location.id}-gid`}>ID листа (gid)</label>
           <input
-            id={`${location.id}-tab`}
-            value={sheetTab}
-            onChange={(event) => setSheetTab(event.target.value)}
-            placeholder="Например, Ligovka"
+            id={`${location.id}-gid`}
+            value={sheetGid}
+            onChange={(event) => setSheetGid(event.target.value)}
+            placeholder="Например, 1408239064"
           />
         </div>
 

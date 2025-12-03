@@ -1,10 +1,11 @@
 import { LocationSection } from './components/LocationSection'
+import { TeamSection } from './components/TeamSection'
 import styles from './App.module.css'
-import { locations } from './data/locations'
+import { baristas, locations } from './data/locations'
 
 function App() {
   const locationCount = locations.length
-  const teamSize = locations.reduce((sum, location) => sum + location.baristas.length, 0)
+  const teamSize = baristas.length
 
   return (
     <div className={styles.app}>
@@ -22,6 +23,8 @@ function App() {
             </div>
           </div>
         </header>
+
+        <TeamSection baristas={baristas} />
 
         <section className={styles.locationsGrid}>
           {locations.map((location) => (
