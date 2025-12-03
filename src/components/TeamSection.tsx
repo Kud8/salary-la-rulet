@@ -16,14 +16,14 @@ export function TeamSection({ baristas }: TeamSectionProps) {
       </div>
 
       <ul className={styles.teamList}>
-        {sortedBaristas.map((barista) => (
-          <li key={barista.id} className={styles.teamItem}>
-            <span className={styles.name}>{barista.name}</span>
-            {barista.bonus > 0 && (
-              <span className={styles.bonus}>+ {barista.bonus.toLocaleString('ru-RU')} ₽</span>
-            )}
-          </li>
-        ))}
+        {sortedBaristas.map((barista) => {
+          const highlight = barista.bonus > 0 ? styles.teamItemHighlight : ''
+          return (
+            <li key={barista.id} className={`${styles.teamItem} ${highlight}`.trim()}>
+              <span className={styles.name}>{barista.name}</span>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

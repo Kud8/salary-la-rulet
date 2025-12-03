@@ -38,21 +38,19 @@
 .teamItem {
   border: 1px solid rgba(93, 80, 255, 0.15);
   border-radius: 14px;
-  padding: 0.75rem 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 0.35rem;
+  padding: 0.65rem 0.9rem;
   background: #f9f9ff;
+  font-weight: 600;
+}
+
+.teamItemHighlight {
+  background: #f2fff6;
+  border-color: rgba(62, 185, 124, 0.35);
+  color: #228353;
 }
 
 .name {
-  font-weight: 600;
-}
-
-.bonus {
-  color: #5d50ff;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: inherit;
 }
 
 @media (max-width: 600px) {

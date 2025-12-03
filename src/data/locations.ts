@@ -3,6 +3,9 @@ export type Location = {
   title: string
   sheetUrl: string
   gid: string
+  rate: number;
+  percent: number;
+  range: string;
 }
 
 export type Barista = {
@@ -17,18 +20,27 @@ export const locations: Location[] = [
     title: 'БВП 47А',
     sheetUrl: 'https://docs.google.com/spreadsheets/d/1wdsUzr3XTMNgz1BBuWewYIQaaxAiFSL-kTv_-QdQ4lw/',
     gid: '1408239064',
+    rate: 200,
+    percent: 4,
+    range: 'AB:BB'
   },
   {
     id: 'gagarina',
     title: 'Гагарина',
     sheetUrl: 'https://docs.google.com/spreadsheets/d/10WRC0dn2rQ9somCAiv2fKBZ2rjTnsKL0RvtM-VZE0Pg',
     gid: '1075859178',
+    rate: 140,
+    percent: 4,
+    range: 'AB:BB'
   },
   {
     id: 'magnit',
     title: 'Магнит',
     sheetUrl: 'https://docs.google.com/spreadsheets/d/1rN9E0S2iJV4KVY5-6EXAy22QyNR4bE74nf2W0894q2M',
     gid: '1943259619',
+    rate: 150,
+    percent: 2,
+    range: 'AB:BB'
   },
 ]
 
