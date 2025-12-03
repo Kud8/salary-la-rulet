@@ -1,4 +1,5 @@
-import { FormEvent, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import styles from './LocationSection.module.css'
 import type { Location } from '../data/locations'
 import { SENIOR_BONUS } from '../data/locations'
