@@ -29,7 +29,7 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<LocationResult | null>(null)
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -122,10 +122,7 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
           onClick={() => setIsOpen((prev) => !prev)}
           aria-expanded={isOpen}
         >
-          <div>
-            <p className={styles.label}>Точка</p>
             <h2>{location.title}</h2>
-          </div>
           <span className={styles.chevron} data-open={isOpen} />
         </button>
 

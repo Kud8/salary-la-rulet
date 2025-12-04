@@ -41,11 +41,70 @@ export function SummaryTable({
   const grandTotals = calculateGrandTotals(rows, locations)
   const bonusTotal = rows.reduce((sum, row) => sum + (adjustments[row.baristaId]?.amount ?? 0), 0)
 
+  const handleExport = () => {
+    const header = [
+      'Бариста',
+      ...locations.map((location) => location.title),
+      'Бонус',
+      'Комментарий',
+      'Сумма',
+    ]
+
+    const csvRows = [
+      header,
+      ...rows.map((row) => {
+        const adjustment = adjustments[row.baristaId] ?? { amount: 0, note: '' }
+        const totalWithBonus = row.overall + adjustment.amount
+
+        return [
+          row.name,
+          ...locations.map((location) => row.totals[location.id] ?? 0),
+          adjustment.amount,
+          adjustment.note,
+          totalWithBonus,
+        ]
+      }),
+      [
+        'Итого',
+        ...locations.map((location) => grandTotals.byLocation[location.id] ?? 0),
+        bonusTotal,
+        '',
+        grandTotals.overall + bonusTotal,
+      ],
+    ]
+
+    const csvContent = csvRows
+      .map((row) =>
+        row
+          .map((cell) => {
+            if (typeof cell === 'number') {
+              return cell.toString().replace('.', ',')
+            }
+            const stringCell = cell ?? ''
+            const needsQuotes = /[",;\n]/.test(stringCell)
+            const escaped = stringCell.replace(/"/g, '""')
+            return needsQuotes ? `"${escaped}"` : escaped
+          })
+          .join(';'),
+      )
+      .join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `payroll-summary-${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.header}>
         <h2>Сводная таблица по всем точкам</h2>
-        <p>Добавь премию или штраф и оставь комментарий.</p>
+        <button type="button" className={styles.exportButton} onClick={handleExport}>
+          Выгрузить CSV
+        </button>
       </div>
       <div className={styles.tableWrapper}>
         <table className={styles.table}>

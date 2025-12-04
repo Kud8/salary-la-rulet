@@ -31,14 +31,14 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(80px, 0.1fr));
   gap: 0.65rem;
 }
 
 .teamItem {
   border: 1px solid rgba(93, 80, 255, 0.15);
   border-radius: 14px;
-  padding: 0.65rem 0.9rem;
+  padding: 0.2rem 0.4rem;
   background: #f9f9ff;
   font-weight: 600;
 }

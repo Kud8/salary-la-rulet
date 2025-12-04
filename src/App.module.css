@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
-  padding: clamp(1rem, 2vw, 1.5rem);
+  padding: 12px 24px;
   border-radius: 18px;
   background: #ffffff;
   border: 1px solid rgba(73, 87, 117, 0.08);
@@ -47,14 +47,13 @@
   border-radius: 12px;
   background: #f5f6fb;
   border: 1px solid rgba(133, 142, 173, 0.2);
-  min-width: 110px;
+  min-width: 80px;
 }
 
 .heroStats span {
   display: block;
   font-size: 0.85rem;
   color: #6d7385;
-  margin-bottom: 0.35rem;
 }
 
 .heroStats strong {

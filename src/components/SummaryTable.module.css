@@ -12,8 +12,26 @@
 
 .header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.35rem;
+}
+
+.exportButton {
+  align-self: flex-start;
+  margin-top: 0.35rem;
+  border: none;
+  border-radius: 999px;
+  background: #5d50ff;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exportButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(93, 80, 255, 0.25);
 }
 
 .header h2 {
@@ -40,7 +58,7 @@
 
 .table th,
 .table td {
-  padding: 0.65rem 0.85rem;
+  padding: 0.2rem 0.4rem;
   text-align: left;
   white-space: nowrap;
 }
@@ -88,9 +106,7 @@
 }
 
 .bonusRow td:first-child {
-  background: rgba(62, 185, 124, 0.12);
-  border-radius: 999px;
-  padding-left: 0.85rem;
+  font-weight: bold;
 }
 
 .table tfoot td {

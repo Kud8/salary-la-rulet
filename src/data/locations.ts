@@ -22,7 +22,7 @@ export const locations: Location[] = [
     gid: '1408239064',
     rate: 200,
     percent: 4,
-    range: 'AB:BB'
+    range: 'AA:BF'
   },
   {
     id: 'gagarina',
@@ -31,7 +31,7 @@ export const locations: Location[] = [
     gid: '1075859178',
     rate: 140,
     percent: 4,
-    range: 'AB:BB'
+    range: 'AB:AZ'
   },
   {
     id: 'magnit',
