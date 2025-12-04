@@ -11,6 +11,7 @@ export type LocationResult = {
   locationTitle: string
   sheetTitle: string
   range: string
+  rowCount?: number
   rows: BaristaBreakdown[]
   totals: {
     base: number
