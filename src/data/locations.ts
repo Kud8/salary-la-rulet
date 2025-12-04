@@ -6,6 +6,7 @@ export type Location = {
   rate: number;
   percent: number;
   range: string;
+  multipleBarista?: boolean
 }
 
 export type Barista = {
@@ -22,6 +23,7 @@ export const locations: Location[] = [
     gid: '1408239064',
     rate: 200,
     percent: 4,
+    multipleBarista: true,
     range: 'AA:BF'
   },
   {

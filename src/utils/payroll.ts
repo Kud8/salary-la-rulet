@@ -4,14 +4,19 @@ import type { BaristaBreakdown, LocationResult } from '../types/payroll'
 const TABLE_ROWS = {
   base: 0,
   percent: 1,
-  date: 3,
-  name: 6,
+  singleName: 7
 } as const
+
+const MULTI_NAME_ROWS = [7, 8] as const
 
 const NORMALIZE_NAME_REGEX = /[\s]+/g
 
+type ExtendedLocation = Location & {
+  multipleBarista?: boolean
+}
+
 type CalculateLocationResultParams = {
-  location: Location
+  location: ExtendedLocation
   sheetTitle: string
   range: string
   values: unknown[][]
@@ -29,6 +34,11 @@ export function calculateLocationResult({
   values,
   baristas,
 }: CalculateLocationResultParams): LocationResult {
+  console.log('location', location)
+  console.log('sheetTitle', sheetTitle)
+  console.log('range', range)
+  console.log('values', values)
+  console.log('baristas', baristas)
   const normalizedBaristas = new Map<string, Barista>()
   baristas.forEach((barista) => {
     normalizedBaristas.set(normalizeName(barista.name), barista)
@@ -38,13 +48,10 @@ export function calculateLocationResult({
 
   const columnCount = values[0]?.length ?? 0
   const unknownNames = new Set<string>()
-
-  for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
-    const rawName = values[TABLE_ROWS.name]?.[columnIndex]
+  const addEarnings = (rawName: unknown, basePortion: number, percentPortion: number) => {
     const normalized = normalizeName(rawName)
-
     if (!normalized) {
-      continue
+      return
     }
 
     const matchedBarista = normalizedBaristas.get(normalized)
@@ -54,19 +61,39 @@ export function calculateLocationResult({
 
     const baristaId = matchedBarista?.id ?? `custom:${normalized}`
     const baristaName = matchedBarista?.name ?? formatName(rawName)
+    const breakdown = rowsMap.get(baristaId) ?? createEmptyBreakdown(baristaId, baristaName)
 
-    const breakdown =
-      rowsMap.get(baristaId) ?? createEmptyBreakdown(baristaId, baristaName)
-
-    const base = parseNumber(values[TABLE_ROWS.base]?.[columnIndex])
-    const percent = parseNumber(values[TABLE_ROWS.percent]?.[columnIndex])
-    const total = base + percent
-
-    breakdown.base += base
-    breakdown.percent += percent
-    breakdown.total += total
+    breakdown.base += basePortion
+    breakdown.percent += percentPortion
+    breakdown.total += basePortion + percentPortion
 
     rowsMap.set(baristaId, breakdown)
+  }
+
+  for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
+    const base = parseNumber(values[TABLE_ROWS.base]?.[columnIndex])
+    const percent = parseNumber(values[TABLE_ROWS.percent]?.[columnIndex])
+
+    if (location.multipleBarista) {
+      const participantNames = MULTI_NAME_ROWS.map((rowIndex) => values[rowIndex]?.[columnIndex]).filter((rawName) =>
+        normalizeName(rawName),
+      )
+      console.log('multipleBarista', columnIndex, participantNames)
+
+      if (participantNames.length === 0) {
+        continue
+      }
+
+      const percentShare = percent / participantNames.length
+
+      participantNames.forEach((rawName) => {
+        addEarnings(rawName, base, percentShare)
+      })
+    } else {
+      const primaryName = values[TABLE_ROWS.singleName]?.[columnIndex]
+
+      addEarnings(normalizeName(primaryName), base, percent)
+    }
   }
 
   if (unknownNames.size > 0) {
@@ -93,6 +120,9 @@ export function calculateLocationResult({
     },
     { base: 0, percent: 0, total: 0 },
   )
+
+  console.log('___')
+  console.log('rows', rows)
 
   return {
     locationId: location.id,
@@ -162,7 +192,7 @@ function parseNumber(value: unknown): number {
 }
 
 function roundCurrency(value: number): number {
-  return Math.round((value + Number.EPSILON) * 10) / 10
+  return Math.floor(value);
 }
 
 export function formatCurrency(value: number): string {
