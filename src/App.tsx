@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { LocationSection } from './components/LocationSection'
 import { TeamSection } from './components/TeamSection'
 import { SummaryTable } from './components/SummaryTable'
+import { RevenueStats } from './components/RevenueStats'
 import styles from './App.module.css'
 import { baristas, locations } from './data/locations'
 import type { LocationResult } from './types/payroll'
@@ -18,11 +19,20 @@ function App() {
   const [bonusAdjustments, setBonusAdjustments] = useState<Record<string, BonusAdjustment>>(() =>
     Object.fromEntries(baristas.map((barista) => [barista.id, { amount: barista.bonus ?? 0, note: '' }])),
   )
+  const [triggerToken, setTriggerToken] = useState(0)
+  const [pendingLocations, setPendingLocations] = useState<Record<string, boolean>>({})
 
   const handleLocationResult = (locationId: string, result: LocationResult) => {
     setLocationResults((prev) => ({
       ...prev,
       [locationId]: result,
+    }))
+  }
+
+  const handlePendingChange = (locationId: string, pending: boolean) => {
+    setPendingLocations((prev) => ({
+      ...prev,
+      [locationId]: pending,
     }))
   }
 
@@ -37,6 +47,17 @@ function App() {
         },
       }
     })
+  }
+
+  const orderedResults = locations
+    .map((location) => locationResults[location.id])
+    .filter((result): result is LocationResult => Boolean(result))
+  const pendingCount = Object.values(pendingLocations).filter(Boolean).length
+  const isAnyPending = pendingCount > 0
+
+  const handleRunAll = () => {
+    if (isAnyPending) return
+    setTriggerToken((prev) => prev + 1)
   }
 
   return (
@@ -54,6 +75,16 @@ function App() {
               <strong>{teamSize}</strong>
             </div>
           </div>
+          <div className={styles.bulkActions}>
+            <button type="button" className={styles.bulkButton} onClick={handleRunAll} disabled={isAnyPending}>
+              {isAnyPending ? 'Считаем…' : 'Посчитать все'}
+            </button>
+            {isAnyPending && (
+              <span className={styles.bulkStatus}>
+                {pendingCount}/{locationCount}
+              </span>
+            )}
+          </div>
         </header>
 
         <TeamSection baristas={baristas} />
@@ -65,9 +96,13 @@ function App() {
               location={location}
               baristas={baristas}
               onResult={handleLocationResult}
+              triggerToken={triggerToken}
+              onPendingChange={handlePendingChange}
             />
           ))}
         </section>
+
+        <RevenueStats results={orderedResults} />
 
         <SummaryTable
           locations={locations}

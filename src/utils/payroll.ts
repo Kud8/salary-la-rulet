@@ -1,17 +1,20 @@
-import type { Barista, Location } from '../data/locations'
+import type { Barista, Location as ConfigLocation } from '../data/locations'
 import type { BaristaBreakdown, LocationResult } from '../types/payroll'
 
 const TABLE_ROWS = {
   base: 0,
   percent: 1,
-  singleName: 7
+  singleName: 7,
+  secondName: 8,
+  revenueSingle: 8,
+  revenueMulti: 9,
 } as const
 
-const MULTI_NAME_ROWS = [7, 8] as const
+const MULTI_NAME_ROWS = [TABLE_ROWS.singleName, TABLE_ROWS.secondName] as const
 
 const NORMALIZE_NAME_REGEX = /[\s]+/g
 
-type ExtendedLocation = Location & {
+type ExtendedLocation = ConfigLocation & {
   multipleBarista?: boolean
 }
 
@@ -34,11 +37,6 @@ export function calculateLocationResult({
   values,
   baristas,
 }: CalculateLocationResultParams): LocationResult {
-  console.log('location', location)
-  console.log('sheetTitle', sheetTitle)
-  console.log('range', range)
-  console.log('values', values)
-  console.log('baristas', baristas)
   const normalizedBaristas = new Map<string, Barista>()
   baristas.forEach((barista) => {
     normalizedBaristas.set(normalizeName(barista.name), barista)
@@ -70,6 +68,8 @@ export function calculateLocationResult({
     rowsMap.set(baristaId, breakdown)
   }
 
+  let revenueSum = 0
+
   for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
     const base = parseNumber(values[TABLE_ROWS.base]?.[columnIndex])
     const percent = parseNumber(values[TABLE_ROWS.percent]?.[columnIndex])
@@ -78,21 +78,23 @@ export function calculateLocationResult({
       const participantNames = MULTI_NAME_ROWS.map((rowIndex) => values[rowIndex]?.[columnIndex]).filter((rawName) =>
         normalizeName(rawName),
       )
-      console.log('multipleBarista', columnIndex, participantNames)
 
       if (participantNames.length === 0) {
         continue
       }
 
       const percentShare = percent / participantNames.length
+      const revenue = parseNumber(values[TABLE_ROWS.revenueMulti]?.[columnIndex])
+      revenueSum += revenue
 
       participantNames.forEach((rawName) => {
         addEarnings(rawName, base, percentShare)
       })
     } else {
       const primaryName = values[TABLE_ROWS.singleName]?.[columnIndex]
-
-      addEarnings(normalizeName(primaryName), base, percent)
+      const revenue = parseNumber(values[TABLE_ROWS.revenueSingle]?.[columnIndex])
+      revenueSum += revenue
+      addEarnings(primaryName, base, percent)
     }
   }
 
@@ -121,14 +123,14 @@ export function calculateLocationResult({
     { base: 0, percent: 0, total: 0 },
   )
 
-  console.log('___')
-  console.log('rows', rows)
+  const percentRate = (location as ConfigLocation & { percent?: number }).percent ?? 0
 
   return {
     locationId: location.id,
     locationTitle: location.title,
     sheetTitle,
     range,
+    revenueTotal: revenueSum || calculateRevenueTotal(percentRate, totals.percent),
     rows,
     totals: {
       base: roundCurrency(totals.base),
@@ -192,12 +194,21 @@ function parseNumber(value: unknown): number {
 }
 
 function roundCurrency(value: number): number {
-  return Math.floor(value);
+  return Math.round((value + Number.EPSILON) * 10) / 10
 }
 
 export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: value % 1 === 0 ? 0 : 1,
   }).format(value)
+}
+
+function calculateRevenueTotal(percentRate: number, percentAmount: number): number {
+  if (!percentRate) {
+    return percentAmount
+  }
+
+  const revenue = percentAmount / (percentRate / 100)
+  return Number.isFinite(revenue) ? revenue : percentAmount
 }
 

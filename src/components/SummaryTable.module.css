@@ -76,11 +76,11 @@
 }
 
 .bonusCell {
-  min-width: 120px;
+  min-width: 100px;
 }
 
 .numberInput {
-  width: 100%;
+  width: 100px;
   border: 1px solid rgba(73, 87, 117, 0.3);
   border-radius: 8px;
   padding: 0.3rem 0.5rem;

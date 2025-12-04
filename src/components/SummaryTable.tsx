@@ -46,8 +46,8 @@ export function SummaryTable({
       'Бариста',
       ...locations.map((location) => location.title),
       'Бонус',
-      'Комментарий',
       'Сумма',
+      'Комментарий',
     ]
 
     const csvRows = [
@@ -60,16 +60,16 @@ export function SummaryTable({
           row.name,
           ...locations.map((location) => row.totals[location.id] ?? 0),
           adjustment.amount,
-          adjustment.note,
           totalWithBonus,
+          adjustment.note,
         ]
       }),
       [
         'Итого',
         ...locations.map((location) => grandTotals.byLocation[location.id] ?? 0),
         bonusTotal,
-        '',
         grandTotals.overall + bonusTotal,
+        '',
       ],
     ]
 
@@ -109,15 +109,15 @@ export function SummaryTable({
       <div className={styles.tableWrapper}>
         <table className={styles.table}>
           <thead>
-            <tr>
-              <th>Сотрудник</th>
-              {locations.map((location) => (
+          <tr>
+            <th>Сотрудник</th>
+            {locations.map((location) => (
                 <th key={location.id}>{location.title}</th>
-              ))}
-              <th>Бонус</th>
-              <th>Комментарий</th>
-              <th>Сумма</th>
-            </tr>
+            ))}
+            <th>Бонус</th>
+            <th>Сумма</th>
+            <th>Комментарий</th>
+          </tr>
           </thead>
           <tbody>
             {rows.map((row) => {
@@ -125,48 +125,48 @@ export function SummaryTable({
               const totalWithBonus = row.overall + adjustment.amount
 
               return (
-                <tr key={row.baristaId} className={row.bonus > 0 ? styles.bonusRow : undefined}>
-                  <td>{row.name}</td>
-                  {locations.map((location) => (
-                    <td key={`${row.baristaId}-${location.id}`}>
-                      {formatCurrency(row.totals[location.id] ?? 0)}
+                  <tr key={row.baristaId} className={row.bonus > 0 ? styles.bonusRow : undefined}>
+                    <td>{row.name}</td>
+                    {locations.map((location) => (
+                        <td key={`${row.baristaId}-${location.id}`}>
+                          {formatCurrency(row.totals[location.id] ?? 0)}
+                        </td>
+                    ))}
+                    <td className={styles.bonusCell}>
+                      <input
+                          type="number"
+                          inputMode="numeric"
+                          className={styles.numberInput}
+                          value={adjustment.amount}
+                          onChange={(event) =>
+                              onAdjustmentChange(row.baristaId, {amount: Number(event.target.value)})
+                          }
+                      />
                     </td>
-                  ))}
-                  <td className={styles.bonusCell}>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      className={styles.numberInput}
-                      value={adjustment.amount}
-                      onChange={(event) =>
-                        onAdjustmentChange(row.baristaId, { amount: Number(event.target.value) })
-                      }
-                    />
-                  </td>
-                  <td className={styles.noteCell}>
-                    <input
-                      type="text"
-                      className={styles.noteInput}
-                      placeholder="Комментарий"
-                      value={adjustment.note}
-                      onChange={(event) => onAdjustmentChange(row.baristaId, { note: event.target.value })}
-                    />
-                  </td>
-                  <td className={styles.totalCell}>{formatCurrency(totalWithBonus)}</td>
-                </tr>
+                    <td className={styles.totalCell}>{formatCurrency(totalWithBonus)}</td>
+                    <td className={styles.noteCell}>
+                      <input
+                          type="text"
+                          className={styles.noteInput}
+                          placeholder="Комментарий"
+                          value={adjustment.note}
+                          onChange={(event) => onAdjustmentChange(row.baristaId, {note: event.target.value})}
+                      />
+                    </td>
+                  </tr>
               )
             })}
           </tbody>
           <tfoot>
-            <tr>
-              <td>Итого</td>
-              {locations.map((location) => (
+          <tr>
+            <td>Итого</td>
+            {locations.map((location) => (
                 <td key={`total-${location.id}`}>{formatCurrency(grandTotals.byLocation[location.id] ?? 0)}</td>
-              ))}
-              <td>{formatCurrency(bonusTotal)}</td>
-              <td />
-              <td>{formatCurrency(grandTotals.overall + bonusTotal)}</td>
-            </tr>
+            ))}
+            <td>{formatCurrency(bonusTotal)}</td>
+            <td>{formatCurrency(grandTotals.overall + bonusTotal)}</td>
+            <td/>
+          </tr>
           </tfoot>
         </table>
       </div>

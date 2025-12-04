@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './LocationSection.module.css'
 import type { Barista, Location } from '../data/locations'
 import type { LocationResult } from '../types/payroll'
@@ -8,6 +8,8 @@ type LocationSectionProps = {
   location: Location
   baristas: Barista[]
   onResult: (locationId: string, result: LocationResult) => void
+  triggerToken?: number
+  onPendingChange?: (locationId: string, pending: boolean) => void
 }
 
 type SheetsReadResponse = {
@@ -21,15 +23,23 @@ type SheetsReadResponse = {
   fetchedAt: string
 }
 
-export function LocationSection({ location, baristas, onResult }: LocationSectionProps) {
+export function LocationSection({
+  location,
+  baristas,
+  onResult,
+  triggerToken,
+  onPendingChange,
+}: LocationSectionProps) {
   const [sheetGid, setSheetGid] = useState(location.gid)
   const [columnRange, setColumnRange] = useState(location.range)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<LocationResult | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const lastTriggerRef = useRef(triggerToken)
 
   const handleSubmit = async () => {
+    if (isLoading) return
     setErrorMessage(null)
 
     if (!sheetGid.trim() || !columnRange.trim()) {
@@ -37,6 +47,7 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
       return
     }
 
+    onPendingChange?.(location.id, true)
     setIsLoading(true)
     try {
       const response = await fetch('/api/sheets/read', {
@@ -97,6 +108,7 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
       setErrorMessage(error instanceof Error ? error.message : 'Ошибка чтения таблицы')
     } finally {
       setIsLoading(false)
+      onPendingChange?.(location.id, false)
     }
   }
 
@@ -109,6 +121,22 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
   }
 
   const sheetLink = `${location.sheetUrl}#gid=${sheetGid}`
+
+  useEffect(() => {
+    if (triggerToken === undefined) {
+      return
+    }
+
+    if (lastTriggerRef.current === undefined) {
+      lastTriggerRef.current = triggerToken
+      return
+    }
+
+    if (triggerToken !== lastTriggerRef.current) {
+      lastTriggerRef.current = triggerToken
+      handleSubmit()
+    }
+  }, [triggerToken])
 
   return (
     <section className={styles.card}>
