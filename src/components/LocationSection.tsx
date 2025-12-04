@@ -119,7 +119,7 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
           onClick={() => setIsOpen((prev) => !prev)}
           aria-expanded={isOpen}
         >
-            <h2>{location.title}</h2>
+          <h2>{location.title}</h2>
           <span className={styles.chevron} data-open={isOpen} />
         </button>
 
@@ -154,7 +154,7 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
           </div>
 
           <a href={sheetLink} className={styles.sheetLink} target="_blank" rel="noreferrer">
-            Таблица
+            Ссылка
           </a>
         </div>
       </div>
