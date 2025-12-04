@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import styles from './LocationSection.module.css'
 import type { Barista, Location } from '../data/locations'
@@ -30,10 +30,6 @@ export function LocationSection({ location, baristas, onResult }: LocationSectio
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<LocationResult | null>(null)
   const [isOpen, setIsOpen] = useState(true)
-  const bonusBaristaIds = useMemo(
-    () => new Set(baristas.filter((barista) => barista.bonus > 0).map((barista) => barista.id)),
-    [baristas],
-  )
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

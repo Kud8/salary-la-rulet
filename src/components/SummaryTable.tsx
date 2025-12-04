@@ -3,10 +3,17 @@ import type { Barista, Location } from '../data/locations'
 import type { LocationResult } from '../types/payroll'
 import { formatCurrency } from '../utils/payroll'
 
+type BonusAdjustment = {
+  amount: number
+  note: string
+}
+
 type SummaryTableProps = {
   locations: Location[]
   baristas: Barista[]
   results: Record<string, LocationResult>
+  adjustments: Record<string, BonusAdjustment>
+  onAdjustmentChange: (baristaId: string, partial: Partial<BonusAdjustment>) => void
 }
 
 type SummaryRow = {
@@ -17,7 +24,13 @@ type SummaryRow = {
   overall: number
 }
 
-export function SummaryTable({ locations, baristas, results }: SummaryTableProps) {
+export function SummaryTable({
+  locations,
+  baristas,
+  results,
+  adjustments,
+  onAdjustmentChange,
+}: SummaryTableProps) {
   const hasData = Object.keys(results).length > 0
 
   if (!hasData) {
@@ -26,12 +39,13 @@ export function SummaryTable({ locations, baristas, results }: SummaryTableProps
 
   const rows = buildRows(locations, baristas, results)
   const grandTotals = calculateGrandTotals(rows, locations)
+  const bonusTotal = rows.reduce((sum, row) => sum + (adjustments[row.baristaId]?.amount ?? 0), 0)
 
   return (
     <section className={styles.section}>
       <div className={styles.header}>
         <h2>Сводная таблица по всем точкам</h2>
-        <p>Бонусы не прибавляются — выделяем старших цветом.</p>
+        <p>Добавь премию или штраф и оставь комментарий.</p>
       </div>
       <div className={styles.tableWrapper}>
         <table className={styles.table}>
@@ -41,21 +55,48 @@ export function SummaryTable({ locations, baristas, results }: SummaryTableProps
               {locations.map((location) => (
                 <th key={location.id}>{location.title}</th>
               ))}
+              <th>Бонус</th>
+              <th>Комментарий</th>
               <th>Сумма</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.baristaId} className={row.bonus > 0 ? styles.bonusRow : undefined}>
-                <td>{row.name}</td>
-                {locations.map((location) => (
-                  <td key={`${row.baristaId}-${location.id}`}>
-                    {formatCurrency(row.totals[location.id] ?? 0)}
+            {rows.map((row) => {
+              const adjustment = adjustments[row.baristaId] ?? { amount: 0, note: '' }
+              const totalWithBonus = row.overall + adjustment.amount
+
+              return (
+                <tr key={row.baristaId} className={row.bonus > 0 ? styles.bonusRow : undefined}>
+                  <td>{row.name}</td>
+                  {locations.map((location) => (
+                    <td key={`${row.baristaId}-${location.id}`}>
+                      {formatCurrency(row.totals[location.id] ?? 0)}
+                    </td>
+                  ))}
+                  <td className={styles.bonusCell}>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      className={styles.numberInput}
+                      value={adjustment.amount}
+                      onChange={(event) =>
+                        onAdjustmentChange(row.baristaId, { amount: Number(event.target.value) })
+                      }
+                    />
                   </td>
-                ))}
-                <td>{formatCurrency(row.overall)}</td>
-              </tr>
-            ))}
+                  <td className={styles.noteCell}>
+                    <input
+                      type="text"
+                      className={styles.noteInput}
+                      placeholder="Комментарий"
+                      value={adjustment.note}
+                      onChange={(event) => onAdjustmentChange(row.baristaId, { note: event.target.value })}
+                    />
+                  </td>
+                  <td className={styles.totalCell}>{formatCurrency(totalWithBonus)}</td>
+                </tr>
+              )
+            })}
           </tbody>
           <tfoot>
             <tr>
@@ -63,7 +104,9 @@ export function SummaryTable({ locations, baristas, results }: SummaryTableProps
               {locations.map((location) => (
                 <td key={`total-${location.id}`}>{formatCurrency(grandTotals.byLocation[location.id] ?? 0)}</td>
               ))}
-              <td>{formatCurrency(grandTotals.overall)}</td>
+              <td>{formatCurrency(bonusTotal)}</td>
+              <td />
+              <td>{formatCurrency(grandTotals.overall + bonusTotal)}</td>
             </tr>
           </tfoot>
         </table>
@@ -111,7 +154,7 @@ function buildRows(
     }
   })
 
-  return rows.filter((row) => row.overall > 0)
+  return rows
 }
 
 function calculateGrandTotals(rows: SummaryRow[], locations: Location[]) {

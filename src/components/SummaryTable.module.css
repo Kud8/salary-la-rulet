@@ -57,6 +57,36 @@
   background: #ffffff;
 }
 
+.bonusCell {
+  min-width: 120px;
+}
+
+.numberInput {
+  width: 100%;
+  border: 1px solid rgba(73, 87, 117, 0.3);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.noteCell {
+  min-width: 200px;
+}
+
+.noteInput {
+  width: 100%;
+  border: 1px solid rgba(73, 87, 117, 0.3);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.totalCell {
+  font-weight: 600;
+}
+
 .bonusRow td:first-child {
   background: rgba(62, 185, 124, 0.12);
   border-radius: 999px;
